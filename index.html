@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lab Notes</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='12' y='8' width='40' height='48' rx='10' fill='%230f5d8a'/%3E%3Crect x='18' y='14' width='28' height='36' rx='6' fill='%23ffffff'/%3E%3Crect x='24' y='8' width='4' height='48' fill='%230f9b73'/%3E%3Crect x='31' y='21' width='11' height='3' rx='1.5' fill='%2390a4b2'/%3E%3Crect x='31' y='28' width='11' height='3' rx='1.5' fill='%2390a4b2'/%3E%3Crect x='31' y='35' width='8' height='3' rx='1.5' fill='%2390a4b2'/%3E%3Ccircle cx='23' cy='23' r='2.4' fill='%230f5d8a'/%3E%3Ccircle cx='23' cy='30' r='2.4' fill='%230f5d8a'/%3E%3Ccircle cx='23' cy='37' r='2.4' fill='%230f5d8a'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="hero">
+      <div class="hero-top">
+        <div class="hero-intro">
+          <!-- <div class="hero-kicker">Local-first research workspace</div> -->
+          <a class="hero-home-link" href="#dashboard" data-tab-jump="dashboard" aria-label="Go to homepage">
+            <h1 class="hero-title"><span class="hero-title-main">Research</span><span class="hero-title-accent">Console</span></h1>
+          </a>
+          <!-- <p>Projects, context, execution, and review in one compact portal built to keep momentum visible without visual clutter.</p> -->
+          <!-- <div class="hero-meta">
+            <span>Project-linked logging</span>
+            <span>Fast status scanning</span>
+            <span>Single-file backup</span>
+          </div> -->
+        </div>
+        <div class="hero-date-wrap">
+          <div class="hero-meta hero-date-meta">
+            <span id="todayDateBadge">Today</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab-btn active" data-tab="dashboard">Dashboard</button>
+      <button class="tab-btn" data-tab="projects">Projects</button>
+      <button class="tab-btn" data-tab="context">Project Context</button>
+      <button class="tab-btn" data-tab="worklog">Work Log</button>
+      <button class="tab-btn" data-tab="runs">Runs &amp; Analyses</button>
+      <button class="tab-btn" data-tab="reviews">Weekly Review</button>
+      <button class="tab-btn" data-tab="data">Data</button>
+      <button class="tab-btn" data-tab="backup">User Guide</button>
+      <div class="tab-utility-actions">
+        <button class="tab-quick-btn" id="openQuickCaptureBtn" type="button">
+          <svg class="tab-utility-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M7.2 2.3a.8.8 0 0 1 1.6 0v4.9h4.9a.8.8 0 0 1 0 1.6H8.8v4.9a.8.8 0 0 1-1.6 0V8.8H2.3a.8.8 0 0 1 0-1.6h4.9V2.3Z"></path>
+          </svg>
+          <span>Quick Capture</span>
+        </button>
+        <button class="tab-search-btn" id="openSearchBtn" type="button">
+          <svg class="tab-search-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M11.2 10.3a5.2 5.2 0 1 0-.9.9l3 3a.65.65 0 1 0 .9-.9l-3-3ZM2.9 6.6a3.9 3.9 0 1 1 7.8 0 3.9 3.9 0 0 1-7.8 0Z"></path>
+          </svg>
+          <span>Open Search</span>
+        </button>
+      </div>
+    </nav>
+
+    <main>
+      <section class="tab-panel active" id="dashboard">
+        <div class="grid dashboard-grid">
+          <div class="span-12 panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>Overview</h2>
+                <!-- <p>A compact snapshot of current research execution.</p> -->
+              </div>
+            </div>
+            <div class="metrics" id="dashboardMetrics"></div>
+          </div>
+
+          <div class="span-6 panel content-panel dashboard-top-panel">
+            <div class="section-title">
+              <div>
+                <h2>Active projects</h2>
+                <!-- <p>Quick visibility into current workstreams, priorities, deadlines, and end dates.</p> -->
+              </div>
+            </div>
+            <div class="list dashboard-scroll-list" id="projectProgressList"></div>
+          </div>
+
+          <div class="span-6 panel content-panel dashboard-top-panel">
+            <div class="section-title">
+              <div>
+                <h2>Today's To-Do List</h2>
+              </div>
+              <div class="pill pill-neutral" id="todayTodoSummary">No items</div>
+            </div>
+            <form id="todayTodoForm" class="todo-form">
+              <input type="hidden" name="id" />
+              <input type="text" name="text" placeholder="Add a task" required />
+              <select name="projectId" data-project-select></select>
+              <button class="btn btn-soft btn-sm" type="submit">Save item</button>
+            </form>
+            <div class="list todo-list dashboard-scroll-list" id="todayTodoList"></div>
+          </div>
+
+          <div class="span-6 panel content-panel dashboard-top-panel">
+            <div class="section-title">
+              <div>
+                <h2>Recent activity</h2>
+                <!-- <p>Latest work sessions across projects.</p> -->
+              </div>
+            </div>
+            <div class="list dashboard-scroll-list" id="recentWorklog"></div>
+          </div>
+
+          <div class="span-6 panel content-panel dashboard-top-panel">
+            <div class="section-title">
+              <div>
+                <h2>Recent runs &amp; analyses</h2>
+                <!-- <p>Latest computational or experimental execution records.</p> -->
+              </div>
+            </div>
+            <div class="list dashboard-scroll-list" id="recentRuns"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="projects">
+        <div class="grid dashboard-grid">
+          <div class="span-12 project-top-grid">
+            <section class="panel content-panel" id="projectFormPanel">
+              <div class="section-title">
+                <div class="title-inline">
+                  <h2>Add Project</h2>
+                  <!-- <span class="small-note">Create or update a project</span> -->
+                </div>
+              </div>
+              <form id="projectForm" class="compact-project-form">
+                <input type="hidden" name="id" />
+                <label>Project title
+                  <input type="text" name="title" placeholder="e.g., Multi-omics integration pipeline" required />
+                </label>
+                <div class="field-grid">
+                  <label>Area / theme
+                    <input type="text" name="area" placeholder="e.g., Method development" />
+                  </label>
+                  <label>Status
+                    <select name="status">
+                      <option>Planning</option>
+                      <option selected>Active</option>
+                      <option>On Hold</option>
+                      <option>Completed</option>
+                    </select>
+                  </label>
+                  <label>Priority
+                    <select name="priority">
+                      <option>Low</option>
+                      <option>Medium</option>
+                      <option selected>High</option>
+                      <option>Critical</option>
+                    </select>
+                  </label>
+                  <label>Start date
+                    <input type="date" name="startDate" />
+                  </label>
+                  <label>Deadline date
+                    <input type="date" name="deadlineDate" />
+                  </label>
+                  <label>End date
+                    <input type="date" name="endDate" />
+                  </label>
+                </div>
+                <label>Collaborator(s)
+                  <input type="text" name="collaborators" placeholder="e.g., John, Doe" />
+                </label>
+                <!-- <p class="small-note">Use Deadline date for the required finish-by date. Use End date only after the project is actually completed.</p> -->
+                <label>Notes
+                  <textarea name="notes" placeholder="Scope, rationale, dependencies, or context"></textarea>
+                </label>
+                <div class="actions-row">
+                  <button class="btn btn-soft" type="submit">Save project</button>
+                  <button class="btn btn-ghost" type="button" data-clear-form="projectForm">Clear form</button>
+                </div>
+              </form>
+            </section>
+
+            <section class="panel content-panel project-directory-panel" id="projectDirectoryPanel">
+              <div class="section-title">
+                <div>
+                  <h2>Project directory</h2>
+                  <!-- <p>Newly added projects appear here. Deadline date is for planning; end date is only the logged completion date.</p> -->
+                </div>
+              </div>
+              <div class="list project-directory-list" id="projectList"></div>
+            </section>
+          </div>
+
+          <div class="span-12 panel content-panel" id="projectWorkspace"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="context">
+        <div class="grid dashboard-grid">
+          <div class="span-12 panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>Project context</h2>
+              </div>
+              <div class="right-tools">
+                <select id="contextProjectSelect" data-project-select></select>
+              </div>
+            </div>
+            <!-- <p class="small-note">This area is only for project context. Work sessions and run records stay in Work Log and Runs &amp; Analyses.</p> -->
+          </div>
+
+          <div class="span-12 section-stack" id="contextContent"></div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="worklog">
+        <div class="two-col worklog-layout">
+          <section class="panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>Work log</h2>
+                <p>Capture what you worked on, what changed, and what comes next.</p>
+              </div>
+            </div>
+            <form id="worklogForm" class="worklog-form">
+              <input type="hidden" name="id" />
+              <div class="field-grid">
+                <label>Date
+                  <input type="date" name="date" required />
+                </label>
+                <label>Project
+                  <select name="projectId" data-project-select></select>
+                </label>
+                <label>Activity type
+                  <select name="type">
+                    <option>Experiment</option>
+                    <option>Analysis</option>
+                    <option>Coding</option>
+                    <option>Writing</option>
+                    <option>Planning</option>
+                    <option>Meeting</option>
+                    <option>Admin</option>
+                    <option>Other</option>
+                  </select>
+                </label>
+                <label>Hours spent
+                  <input type="number" name="hours" min="0" step="0.25" value="1" />
+                </label>
+              </div>
+              <label>Objective
+                <textarea name="objective" placeholder="What was the goal of the work session?"></textarea>
+              </label>
+              <label>Outcome
+                <textarea name="outcome" placeholder="What happened, what was finished, or what was learned?"></textarea>
+              </label>
+              <label>Next step
+                <textarea name="nextStep" placeholder="What should happen next to keep momentum?"></textarea>
+              </label>
+              <div class="actions-row">
+                <button class="btn btn-soft" type="submit">Save work log</button>
+                <button class="btn btn-ghost" type="button" data-clear-form="worklogForm">Clear form</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>Recent activity</h2>
+              </div>
+              <div class="right-tools">
+                <select id="worklogFilter" data-project-filter="worklog"></select>
+              </div>
+            </div>
+            <div class="list" id="worklogList"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="runs">
+        <div class="section-stack">
+          <section class="panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>Runs &amp; analyses</h2>
+                <p>Log computational runs, analysis sessions, pipelines, or experimental execution linked to a project.</p>
+              </div>
+            </div>
+            <div class="subtabs">
+              <button class="subtab-btn active" type="button" data-runs-tab="runs">Runs</button>
+              <button class="subtab-btn" type="button" data-runs-tab="compare">Experiment Comparison</button>
+            </div>
+          </section>
+
+          <section class="panel content-panel runs-subtab-panel active" data-runs-panel="runs">
+            <div class="two-col runs-workspace">
+              <section class="run-tool-card run-pane" id="runFormPanel">
+                <div class="section-title">
+                  <div>
+                    <h3 id="runFormHeading">Add new run / analysis</h3>
+                    <p id="runFormIntro">Capture the setup, outcome, and next step for a run or analysis.</p>
+                  </div>
+                </div>
+                <form id="runForm" class="run-form">
+                  <input type="hidden" name="id" />
+                  <div class="field-grid">
+                    <label>Date
+                      <input type="date" name="date" required />
+                    </label>
+                    <label>Project
+                      <select name="projectId" data-project-select></select>
+                    </label>
+                    <label>Entry type
+                      <select name="kind">
+                        <option>Run</option>
+                        <option selected>Analysis</option>
+                        <option>Pipeline</option>
+                        <option>Benchmark</option>
+                        <option>QC</option>
+                        <option>Visualization</option>
+                        <option>Simulation</option>
+                        <option>Experiment</option>
+                        <option>Other</option>
+                      </select>
+                    </label>
+                    <label>Status
+                      <select name="status">
+                        <option>Planned</option>
+                        <option selected>Running</option>
+                        <option>Needs Review</option>
+                        <option>Complete</option>
+                        <option>Paused</option>
+                        <option>Cancelled</option>
+                      </select>
+                    </label>
+                    <label>Title
+                      <input type="text" name="title" placeholder="e.g., RNA-seq differential expression rerun" required />
+                    </label>
+                    <label>Tool / method
+                      <input type="text" name="tool" placeholder="e.g., Nextflow, DESeq2, custom script" />
+                    </label>
+                  </div>
+                  <label>Inputs / dataset / sample set
+                    <textarea name="inputs" placeholder="Which data, samples, or files were used?"></textarea>
+                  </label>
+                  <label>Parameters / setup
+                    <textarea name="parameters" placeholder="Key parameters, versions, settings, command notes, or environment details"></textarea>
+                  </label>
+                  <label>Outcome / summary
+                    <textarea name="summary" placeholder="What happened, what completed, or what the outputs suggest?"></textarea>
+                  </label>
+                  <div class="field-grid">
+                    <label>Output location / reference
+                      <input type="text" name="location" placeholder="e.g., folder path, notebook name, or result ID" />
+                    </label>
+                    <label>Next step
+                      <input type="text" name="nextStep" placeholder="What should happen next?" />
+                    </label>
+                  </div>
+                  <div class="actions-row">
+                    <button class="btn btn-soft" id="runFormSubmitBtn" type="submit">Save run / analysis</button>
+                    <button class="btn btn-ghost" id="clearRunFormBtn" type="button" data-clear-form="runForm">Clear form</button>
+                    <button class="btn btn-ghost" id="closeRunFormBtn" type="button">Cancel editing</button>
+                  </div>
+                </form>
+              </section>
+
+              <section class="run-tool-card run-pane">
+                <div class="section-title">
+                  <div>
+                    <h3>Run log</h3>
+                    <p>Review saved runs, edit entries, or send any two to comparison.</p>
+                  </div>
+                  <div class="right-tools">
+                    <select id="runFilter" data-project-filter="runs"></select>
+                  </div>
+                </div>
+                <div class="list" id="runList"></div>
+              </section>
+            </div>
+          </section>
+
+          <section class="panel content-panel runs-subtab-panel" data-runs-panel="compare" id="runComparePanel">
+            <div class="section-title">
+              <div>
+                <h3>Experiment comparison</h3>
+                <p>Compare two runs side by side across inputs, parameters, outputs, summary, and next step.</p>
+              </div>
+            </div>
+            <div class="compare-controls">
+              <label>Run A
+                <select id="runCompareLeft"></select>
+              </label>
+              <label>Run B
+                <select id="runCompareRight"></select>
+              </label>
+            </div>
+            <div class="actions-row compare-actions-row">
+              <button class="btn btn-ghost btn-sm" id="swapRunCompareBtn" type="button">Swap</button>
+              <button class="btn btn-ghost btn-sm" id="clearRunCompareBtn" type="button">Clear comparison</button>
+            </div>
+            <div class="compare-grid" id="runCompareView"></div>
+          </section>
+
+        </div>
+      </section>
+
+      <section class="tab-panel" id="reviews">
+        <div class="two-col review-layout">
+          <section class="panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>Weekly review</h2>
+                <p>A lightweight reflection to improve execution</p>
+              </div>
+            </div>
+            <form id="reviewForm">
+              <input type="hidden" name="id" />
+              <div class="field-grid">
+                <label>Week of
+                  <input type="date" name="weekOf" required />
+                </label>
+                <label>Project link
+                  <select name="projectId" data-project-select></select>
+                </label>
+              </div>
+              <label>Biggest win
+                <textarea name="win" placeholder="What moved forward meaningfully this week?"></textarea>
+              </label>
+              <label>Key lesson
+                <textarea name="lesson" placeholder="What should be done differently or continued?"></textarea>
+              </label>
+              <label>Top priority next week
+                <textarea name="priority" placeholder="What deserves most attention next week?"></textarea>
+              </label>
+              <label>Support needed
+                <textarea name="support" placeholder="What help, resource, or decision is needed?"></textarea>
+              </label>
+              <div class="actions-row">
+                <button class="btn btn-soft" type="submit">Save review</button>
+                <button class="btn btn-ghost" type="button" data-clear-form="reviewForm">Clear form</button>
+              </div>
+            </form>
+          </section>
+
+          <section class="panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>Review archive</h2>
+                <p>A running record of wins, lessons, and next priorities.</p>
+              </div>
+            </div>
+            <div class="list" id="reviewList"></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="data">
+        <div class="grid dashboard-grid data-grid">
+          <div class="span-7 panel content-panel data-panel">
+            <div class="section-title">
+              <div>
+                <h2>Data actions</h2>
+                <p>Export, import, or reset local portal data.</p>
+              </div>
+            </div>
+            <div class="data-callout">
+              <h4>Stored locally</h4>
+              <p>Your records stay in this browser until you export or reset them.</p>
+            </div>
+            <div class="data-action-grid">
+              <div class="data-action-card">
+                <div class="data-action-head">
+                  <h4>Starter data</h4>
+                  <span class="pill pill-neutral">Optional</span>
+                </div>
+                <p>Load sample records to preview the portal.</p>
+                <div class="actions-row">
+                  <button class="btn btn-soft" id="loadDemoBtn" type="button">Load demo data</button>
+                </div>
+              </div>
+              <div class="data-action-card">
+                <div class="data-action-head">
+                  <h4>Export backup</h4>
+                  <span class="pill tag-neutral">JSON</span>
+                </div>
+                <p>Download all current records as JSON.</p>
+                <div class="actions-row">
+                  <button class="btn btn-soft" id="exportBtn" type="button">Export backup JSON</button>
+                </div>
+              </div>
+              <div class="data-action-card">
+                <div class="data-action-head">
+                  <h4>Import backup</h4>
+                  <span class="pill tag-neutral">Restore</span>
+                </div>
+                <p>Restore a backup JSON file.</p>
+                <div class="actions-row">
+                  <button class="btn btn-soft" id="importBtn" type="button">Import backup JSON</button>
+                </div>
+                <p class="small-note" id="importStatus">Choose an exported `.json` file.</p>
+              </div>
+              <div class="data-action-card data-danger-card">
+                <div class="data-action-head">
+                  <h4>Reset local data</h4>
+                  <span class="pill priority-critical">Irreversible</span>
+                </div>
+                <p>Delete all records in this browser after confirmation.</p>
+                <div class="actions-row">
+                  <button class="btn btn-danger" id="resetBtn" type="button">Reset all data</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="span-5 panel content-panel data-panel">
+            <div class="section-title">
+              <div>
+                <h2>Data overview</h2>
+                <p>Current records in this browser.</p>
+              </div>
+            </div>
+            <div class="data-overview-grid" id="dataOverviewMetrics"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="backup">
+        <div class="grid dashboard-grid">
+          <div class="span-12 panel content-panel">
+            <!-- <div class="section-title">
+              <div>
+                <h2>Guide &amp; Recovery</h2>
+                <p>Start here if this is your first time. This page shows what to log, where each tab fits, and how to keep a recoverable copy of your work.</p>
+              </div>
+              <div class="pill pill-neutral">First-time guide</div>
+            </div> -->
+            <div class="data-callout">
+              <h4>Start small, then keep it current</h4>
+              <p>Your portal data stays in this browser until you export it. For a first setup, create one project, add one to-do, log one real session or run, and export one backup.</p>
+            </div>
+            <div class="backup-quick-grid">
+              <div class="backup-quick-card">
+                <h4>Preview with demo data</h4>
+                <p>Use Data &gt; Load demo data to see a filled example first. It replaces the current portal state, so export before using it if you already have real work saved.</p>
+              </div>
+              <div class="backup-quick-card">
+                <h4>Capture fast from anywhere</h4>
+                <p>Use Quick Capture in the top bar when you want to log a work session, run, finding, idea, blocker, or to-do without switching tabs first.</p>
+              </div>
+              <div class="backup-quick-card">
+                <h4>Find and reopen quickly</h4>
+                <p>Use Open Search to jump back to saved projects, runs, context notes, reviews, and to-dos without manually browsing each tab.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="span-6 panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>What Goes Where</h2>
+                <p>Use the smallest useful note in the tab that matches the type of information.</p>
+              </div>
+            </div>
+            <div class="guide-list">
+              <div class="guide-item">
+                <div class="guide-index">1</div>
+                <div>
+                  <h4>Dashboard</h4>
+                  <p>Use it for a quick snapshot of active work, today&apos;s to-dos, recent activity, and what needs attention first.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">2</div>
+                <div>
+                  <h4>Projects</h4>
+                  <p>Create the main record for each project and use its workspace as the hub for linked runs, work logs, context notes, health metrics, and the project timeline.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">3</div>
+                <div>
+                  <h4>Project Context</h4>
+                  <p>Store findings, ideas, and blockers that should stay attached to a project instead of getting lost in general notes or chat threads.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">4</div>
+                <div>
+                  <h4>Work Log</h4>
+                  <p>Capture a session in three lines: objective, outcome, and next step. This is the fastest way to preserve momentum and reconstruct what actually happened.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">5</div>
+                <div>
+                  <h4>Runs &amp; Analyses</h4>
+                  <p>Record tools, inputs, parameters, outputs, and status whenever reproducibility matters, then use the built-in comparison panel to review two runs side by side.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">6</div>
+                <div>
+                  <h4>Reviews, Search, and Data</h4>
+                  <p>Use Weekly Review to close the week, Open Search to reopen anything quickly, and Data to export, import, reset local records, or load demo data.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="span-6 panel content-panel">
+            <div class="section-title">
+              <div>
+                <h2>Recommended Routine</h2>
+                <p>A lightweight workflow that keeps the portal useful without turning it into admin work.</p>
+              </div>
+            </div>
+            <div class="guide-list">
+              <div class="guide-item">
+                <div class="guide-index">1</div>
+                <div>
+                  <h4>Start with one active project</h4>
+                  <p>Do not try to backfill everything at once. Begin with the project you are actively working on now and add only the minimum context it needs.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">2</div>
+                <div>
+                  <h4>Use Quick Capture during the day</h4>
+                  <p>When you finish a session or hit a blocker, capture it immediately from the top bar instead of waiting to do a full update later.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">3</div>
+                <div>
+                  <h4>Separate session notes from run details</h4>
+                  <p>Use Work Log for what you tried and learned. Use Runs &amp; Analyses for tools, parameters, inputs, outputs, and status.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">4</div>
+                <div>
+                  <h4>Review the project timeline</h4>
+                  <p>Open the project workspace when you need the full story. The timeline combines work logs, runs, findings, ideas, blockers, and linked reviews in one feed.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">5</div>
+                <div>
+                  <h4>Compare runs before deciding</h4>
+                  <p>When two runs differ, use the comparison panel in Runs &amp; Analyses to review inputs, parameters, outputs, summary, and next step side by side.</p>
+                </div>
+              </div>
+              <div class="guide-item">
+                <div class="guide-index">6</div>
+                <div>
+                  <h4>Export at meaningful checkpoints</h4>
+                  <p>Export before clearing browser data, switching devices, using a private profile, or after major updates you would not want to lose.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <div class="footer-note">
+      <div class="footer-credit">
+        <span>&copy; 2026 | Developed by</span>
+        <a href="https://github.com/geek09rk" target="_blank" rel="noreferrer noopener" aria-label="Raghav Kataria on GitHub">
+          <svg class="github-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8a8 8 0 0 0 5.47 7.59c.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.5-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82A7.65 7.65 0 0 1 8 4.86c.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"></path>
+          </svg>
+          <span>Raghav Kataria</span>
+        </a>
+        <a id="footerFeedbackLink" class="footer-feedback-link" href="https://forms.gle/QvEvu24T7opV4GJ28" target="_blank" rel="noreferrer noopener" aria-label="Send feedback">
+          <span>Feedback</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="importFile" accept=".json,application/json" hidden />
+  <button class="btn back-to-top" id="backToTopBtn" type="button">&#8593; Top</button>
+  <div class="toast" id="toast"></div>
+  <div class="search-modal" id="searchModal" hidden aria-hidden="true">
+    <div class="search-shell" role="dialog" aria-modal="true" aria-labelledby="searchTitle">
+      <div class="search-topbar">
+        <div class="search-input-wrap">
+          <div class="search-label" id="searchTitle">Search the portal</div>
+          <input
+            class="search-input"
+            id="searchInput"
+            type="text"
+            placeholder="Search projects, logs, runs, context, reviews, and to-dos"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <p class="search-input-hint">Use Up/Down to move, Enter to open, and Escape to close.</p>
+        </div>
+        <button class="btn btn-ghost search-close-btn" id="closeSearchBtn" type="button" data-search-dismiss>Close</button>
+      </div>
+      <div class="search-body">
+        <div class="search-scopes" id="searchScopeList">
+          <button class="search-scope-btn active" type="button" data-search-scope="all">All</button>
+          <button class="search-scope-btn" type="button" data-search-scope="projects">Projects</button>
+          <button class="search-scope-btn" type="button" data-search-scope="logs">Work Log</button>
+          <button class="search-scope-btn" type="button" data-search-scope="runs">Runs</button>
+          <button class="search-scope-btn" type="button" data-search-scope="context">Context</button>
+          <button class="search-scope-btn" type="button" data-search-scope="reviews">Reviews</button>
+          <button class="search-scope-btn" type="button" data-search-scope="todos">To-Do</button>
+        </div>
+        <div class="search-summary">
+          <div id="searchSummaryText">Search across all saved portal records.</div>
+          <div class="pill pill-neutral" id="searchResultCount">Ready</div>
+        </div>
+        <div class="search-results" id="searchResults" role="listbox" aria-label="Search results"></div>
+      </div>
+    </div>
+  </div>
+  <div class="quick-capture-modal" id="quickCaptureModal" hidden aria-hidden="true">
+    <div class="quick-capture-shell" role="dialog" aria-modal="true" aria-labelledby="quickCaptureTitle" aria-describedby="quickCaptureSubtitle">
+      <div class="quick-capture-topbar">
+        <div>
+          <div class="quick-capture-kicker">Quick capture</div>
+          <h3 id="quickCaptureTitle">Save a record from anywhere</h3>
+          <p id="quickCaptureSubtitle">Capture a work log, run, finding, idea, blocker, or to-do without switching tabs first.</p>
+        </div>
+        <button class="btn btn-ghost" id="closeQuickCaptureBtn" type="button" data-quick-capture-dismiss>Close</button>
+      </div>
+      <div class="quick-capture-tabs" id="quickCaptureTabs">
+        <button class="quick-capture-tab" type="button" data-quick-capture-tab="worklog">Work Log</button>
+        <button class="quick-capture-tab" type="button" data-quick-capture-tab="run">Run / Analysis</button>
+        <button class="quick-capture-tab" type="button" data-quick-capture-tab="finding">Finding</button>
+        <button class="quick-capture-tab" type="button" data-quick-capture-tab="idea">Idea</button>
+        <button class="quick-capture-tab" type="button" data-quick-capture-tab="blocker">Blocker</button>
+        <button class="quick-capture-tab" type="button" data-quick-capture-tab="todo">To-Do</button>
+      </div>
+      <div class="quick-capture-body" id="quickCaptureContent"></div>
+    </div>
+  </div>
+  <div class="confirm-modal" id="confirmModal" hidden aria-hidden="true">
+    <div class="confirm-card" role="dialog" aria-modal="true" aria-labelledby="confirmTitle" aria-describedby="confirmMessage">
+      <div class="confirm-head">
+        <div class="confirm-icon" aria-hidden="true">!</div>
+        <div class="confirm-copy">
+          <div class="confirm-eyebrow" id="confirmEyebrow">Please confirm</div>
+          <h3 class="confirm-title" id="confirmTitle">Confirm action</h3>
+          <p class="confirm-message" id="confirmMessage"></p>
+        </div>
+      </div>
+      <div class="confirm-actions">
+        <button class="btn btn-ghost" id="confirmCancelBtn" type="button" data-confirm-dismiss>Cancel</button>
+        <button class="btn btn-danger" id="confirmApproveBtn" type="button" data-confirm-approve>Confirm</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
